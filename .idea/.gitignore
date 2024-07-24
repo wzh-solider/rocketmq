@@ -8,5 +8,3 @@
 /dataSources.local.xml
 
 ../rocketmq_use_fast/target
-
-../rocketmq_use_fast/src/main/resources/application.yml
