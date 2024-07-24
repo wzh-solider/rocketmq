@@ -1,0 +1,3 @@
+com\solider\rocketmq_use_fast\constant\MqConstant.class
+com\solider\rocketmq_use_fast\demo\ASimpleTest.class
+com\solider\rocketmq_use_fast\RocketmqUseFastApplication.class
