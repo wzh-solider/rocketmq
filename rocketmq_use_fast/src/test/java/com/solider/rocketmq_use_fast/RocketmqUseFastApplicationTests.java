@@ -15,7 +15,7 @@ class RocketmqUseFastApplicationTests {
      * 发送消息
      */
     @Test
-    void contextLoads(){
+    void contextLoads() {
     }
 
 }
