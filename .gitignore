@@ -1,7 +1,9 @@
 /rocketmq_use_fast/src/main/resources/application.yml
 
-/rocketmq_use_fast/target
+/**/target
 
 .idea
+
+/**/.mvn
 
 rocketmq.iml
