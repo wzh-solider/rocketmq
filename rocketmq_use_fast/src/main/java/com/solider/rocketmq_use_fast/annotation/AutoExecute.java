@@ -1,5 +1,8 @@
 package com.solider.rocketmq_use_fast.annotation;
 
+import com.solider.rocketmq_use_fast.common.enums.MqType;
+import com.sun.istack.NotNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,7 +24,18 @@ public @interface AutoExecute {
     boolean enable() default true;
 
     /**
-     * 生产者组名
+     * 对象类型
+     */
+    @NotNull
+    MqType mqType();
+
+    /**
+     * 执行
+     */
+    String subExpression() default "*";
+
+    /**
+     * 组名
      */
     String groupName() default "rocketmq_default_group";
 

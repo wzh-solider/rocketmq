@@ -2,6 +2,7 @@ package com.solider.rocketmq_use_fast.aspect;
 
 import com.solider.rocketmq_use_fast.annotation.AutoExecute;
 import com.solider.rocketmq_use_fast.common.config.MqProperties;
+import com.solider.rocketmq_use_fast.common.enums.MqType;
 import com.solider.rocketmq_use_fast.constant.MqConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -48,31 +49,38 @@ public class AutoExecuteAspect {
 
         // 开启自动执行
         if (annotation.enable()) {
-            log.info("填充字段");
-            Object[] args = joinPoint.getArgs();
-            Class<?> param01 = args[0].getClass();
-            param01.getMethod("setProducerGroup", String.class).invoke(args[0], annotation.groupName());
-            param01.getMethod("setNamesrvAddr", String.class).invoke(args[0], mqProperties.getNamesrvAddr() + ":" + mqProperties.getPort());
-
-            Class<?> param02 = args[1].getClass();
-            // Constructor<?> constructor02 = param02.getDeclaredConstructor(String.class, byte[].class);
-            // Object o1 = constructor02.newInstance(annotation.topicName(), annotation.content().getBytes());
-            param02.getMethod("setTopic", String.class).invoke(args[1], annotation.topicName());
-            param02.getMethod("setBody", byte[].class).invoke(args[1], annotation.content().getBytes());
-
-            // log.info("字段填充成功：message>>>{}", o1);
-        } else {
-            return;
+            if (MqType.PRODUCER.equals(annotation.mqType())) {
+                log.info("填充字段");
+                Object[] args = joinPoint.getArgs();
+                Class<?> param01 = args[0].getClass();
+                param01.getMethod("setProducerGroup", String.class).invoke(args[0], annotation.groupName());
+                param01.getMethod("setNamesrvAddr", String.class).invoke(args[0], mqProperties.getNamesrvAddr() + ":" + mqProperties.getPort());
+                Class<?> param02 = args[1].getClass();
+                param02.getMethod("setTopic", String.class).invoke(args[1], annotation.topicName());
+                param02.getMethod("setBody", byte[].class).invoke(args[1], annotation.content().getBytes());
+            } else if (MqType.CONSUMER.equals(annotation.mqType())) {
+                Object[] args = joinPoint.getArgs();
+                Class<?> param01 = args[0].getClass();
+                param01.getMethod("setConsumerGroup", String.class).invoke(args[0], annotation.groupName());
+                param01.getMethod("setNamesrvAddr", String.class).invoke(args[0], mqProperties.getNamesrvAddr() + ":" + mqProperties.getPort());
+                param01.getMethod("subscribe", String.class, String.class).invoke(args[0], annotation.topicName(), annotation.subExpression());
+            } else {
+                return;
+            }
         }
     }
 
-    @After("autoExecute()")
-    public void after(JoinPoint joinPoint) {
-        log.info("自动执行结束, 释放资源");
+        @After("autoExecute()")
+        public void after(JoinPoint joinPoint){
+            if (MqType.PRODUCER.equals(((MethodSignature) joinPoint
+                    .getSignature()).getMethod()
+                    .getAnnotation(AutoExecute.class).mqType())) {
+                log.info("自动执行结束, 释放资源");
 
-        DefaultMQProducer producer = (DefaultMQProducer) joinPoint.getArgs()[0];
-        producer.shutdown();
+                DefaultMQProducer producer = (DefaultMQProducer) joinPoint.getArgs()[0];
+                producer.shutdown();
 
-        log.info("资源释放成功, 关闭=>=>=>=>producer：{}", producer);
+                log.info("资源释放成功, 关闭=>=>=>=>producer：{}", producer);
+            }
+        }
     }
-}
