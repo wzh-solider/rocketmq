@@ -1,6 +1,7 @@
 package com.solider.rocketmq_use_fast.demo;
 
 import com.solider.rocketmq_use_fast.annotation.AutoExecute;
+import com.solider.rocketmq_use_fast.common.enums.MqType;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class COneWayTest {
     /**
      * 发送单向消息
      */
-    @AutoExecute(groupName = "oneway-producer-group",
+    @AutoExecute(mqType = MqType.PRODUCER, groupName = "oneway-producer-group",
             topicName = "onewayTopic", content = "日志xxx")
     public void oneWayProducerService(DefaultMQProducer producer, Message message) throws Exception {
         producer.start();
